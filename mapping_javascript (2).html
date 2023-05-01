@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Volcano_Map</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="D:/UNT/Data/project/leaflet.css" />
+</head>
+<body>
+    <div id="map" style="height: 600px;"></div>
+    <script src="D:/UNT/Data/project/leaflet.js"></script>
+    <script src="D:/UNT/Data/project/min.js"></script>
+    <script>
+        var map = L.map('map').setView([0, 0], 2);
+
+        // Adding the base tile layer to the map
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
+            maxZoom: 18,
+        }).addTo(map);
+
+        // Defining volcano type colors
+        var volcano_type_colors = {
+            'Stratovolcano': 'blue',
+            'Caldera': 'purple',
+            'Shield': 'green',
+            'Shield(s)': 'red'
+        };
+
+        // Loading the volcano data from the CSV file
+        fetch('https://gist.githubusercontent.com/Ramch16/4edb607e3a9fde86b7c367ad56b64f34/raw/b46c3142910eb2467b96df7c9e95ba0c5346eac1/Project_increment_1.csv')
+            .then(response => response.text())
+            .then(data => {
+                var parsed_data = Papa.parse(data, {header: true}).data;
+
+                // Looping volcanos and added a marker to maps
+                parsed_data.forEach(volcano => {
+                    var color = volcano_type_colors[volcano.primary_volcano_type] || 'red';
+                    var icon_url = "D:/UNT/Data/project/test1.png"
+                    var marker = L.marker([volcano.latitude, volcano.longitude], {icon: L.icon({iconUrl: icon_url, iconSize: [50, 50], iconAnchor: [25, 50], popupAnchor: [0, -50]})}).addTo(map);
+                    marker.bindPopup(`<b>${volcano.volcano_name}</b><br>Type: ${volcano.primary_volcano_type}<br>Country: ${volcano.country}`);
+                });
+            });
+    </script>
+</body>
+</html>
